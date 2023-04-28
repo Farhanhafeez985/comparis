@@ -1,0 +1,36 @@
+{% extends 'base_temp.html' %}
+{% load static %}
+{% block title %}
+    <title>Login</title>
+{% endblock title %}
+{% block body %}
+    <div class="back">
+        <div class="div-center rounded">
+            <div class="content">
+                <h3>Login</h3>
+                <hr/>
+                <form method="post" action="login">
+                    {% include 'message.html' %}
+                    {% csrf_token %}
+                    {% if request.GET.next %}
+                        <input type="hidden" name="next" value="{{ request.GET.next }}">
+                    {% endif %}
+                    {{ form }}
+                    <button type="submit" class="login_btn btn btn-primary">Login</button>
+                    <hr/>
+                    <a type="submit" href="{% url 'signup' %}" class="login_btn btn btn-primary">Signup</a>
+                    <a type="submit" href="{% url 'password_reset' %}" class="login_btn btn btn-primary">Reset
+                        Password</a>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock body %}
+{% block js %}
+    <script> window.setTimeout(function () {
+        $("#msg").fadeTo(500, 0).slideUp(500, function () {
+            $(this).remove();
+        });
+    }, 2000);
+    </script>
+{% endblock js %}
