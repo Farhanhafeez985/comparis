@@ -23,6 +23,8 @@ def properties_views(request):
     if request.method == 'POST':
         p_type = request.POST.get('p_type')
         town_postcode = request.POST.get('town_postcode')
+        if town_postcode:
+            town_postcode = town_postcode.split(',')
         price = request.POST.get('price')
         room = request.POST.get('room')
         duration = request.POST.get('duration')
@@ -33,29 +35,31 @@ def properties_views(request):
             queryset = queryset.filter(property_type_text=p_type)
 
         if town_postcode:
-            queryset = queryset.filter(postalcode=town_postcode)
+            queryset = queryset.filter(postalcode__in=town_postcode)
 
         if price:
             queryset = queryset.filter(price__lte=int(price))
 
         if room:
-            queryset = queryset.filter(room__lte=room)
+            queryset = queryset.filter(room__gte=room)
         if status:
             if status == 'any':
                 queryset = queryset.filter().all()
             elif status == 'online':
-                queryset = queryset.filter(online_status__isnull=False)
+                queryset = queryset.filter(online_status__isnull=False).exclude(online_status='Offline')
             elif status == 'offline':
-                queryset = queryset.filter(online_status__isnull=True)
+                queryset = queryset.filter(online_status='Offline')
 
         if search_date:
             queryset = queryset.filter(found_for_the_first_time__gte=search_date)
 
         if duration:
-            start_date = date.today() - timedelta(days=int(duration))
-            end_date = date.today()
-            query = Q(found_for_the_first_time__range=(start_date, end_date))
-            queryset = queryset.filter(query)
+            # start_date = date.today() - timedelta(days=int(duration))
+            # print(start_date)
+            # end_date = date.today()
+            # query = Q(found_for_the_first_time__range=(start_date, end_date))
+            # queryset = queryset.filter(query)
+            queryset = queryset.filter(duration__gte=duration)
 
         try:
             page_number = int(request.POST.get('page', '1'))
